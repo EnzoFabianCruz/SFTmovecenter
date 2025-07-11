@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>SFT Move Center - Iniciar sesión</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+  <div class="login-container">
+    <h1>SFT Move Center</h1>
+    <h2>Iniciar Sesión</h2>
+    
+    <form method="POST">
+      <input type="text" name="usuario" placeholder="Usuario" required>
+      <input type="password" name="clave" placeholder="Contraseña" required>
+      <button type="submit">Entrar</button>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <p class="error-message">{{ message }}</p>
+      {% endfor %}
+    {% endwith %}
+  </div>
+</body>
+</html>
