@@ -3,7 +3,7 @@ services:
     name: agenda-sql-app
     env: python
     buildCommand: ./render-build.sh
-    startCommand: python app.py
+    startCommand: gunicorn app:app
     region: oregon
     plan: free
     envVars:
