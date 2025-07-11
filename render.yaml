@@ -6,3 +6,6 @@ services:
     startCommand: python app.py
     region: oregon
     plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
