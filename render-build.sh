@@ -2,7 +2,7 @@
 
 set -e
 
-# Actualiza e instala herramientas necesarias
+# Actualiza paquetes y dependencias necesarias
 apt-get update && apt-get install -y \
     curl \
     gnupg2 \
@@ -11,19 +11,19 @@ apt-get update && apt-get install -y \
     unixodbc-dev \
     gcc \
     g++ \
-    make \
-    python3-dev \
-    python3-pip
+    make
 
-# Agrega repositorio de Microsoft ODBC
+# Agrega la clave y el repo de Microsoft
 curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list
 
-# Instala el driver ODBC 17
+# Actualiza y fuerza la instalación del driver ODBC 17
 apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
-# Actualiza pip y wheel antes de instalar dependencias
-python3 -m pip install --upgrade pip wheel setuptools
+# Verifica que esté instalado correctamente
+echo "Verificando instalación del driver..."
+odbcinst -q -d | grep -i "ODBC Driver 17"
 
-# Instala las dependencias del proyecto
+# Instala dependencias de Python
+pip install --upgrade pip
 pip install -r requirements.txt
