@@ -50,18 +50,17 @@ def mostrar_agenda():
 
     for row in rows:
         row_dict = dict(zip(columns, row))
-        numh = row_dict.get("numhorario")
-        if numh == 14:
-            row_dict["numhorario"] = 8
-        elif 8 <= numh <= 13:
-            row_dict["numhorario"] = numh + 1
-
         limpio = {k: row_dict[k] for k in columnas_permitidas if k in row_dict}
         data.append(limpio)
 
-    data = sorted(data, key=lambda x: x.get("numhorario", 0))
-    #for fila in data:
-     #   fila.pop("numhorario", None)
+    # Diccionario de orden cronológico de los horarios
+    orden_horario = {
+        17: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7,
+        7: 8, 14: 9, 15: 10, 8: 11, 9: 12, 10: 13, 11: 14, 12: 15, 13:16
+    }
+
+    # Ordenar la data usando el diccionario
+    data = sorted(data, key=lambda x: orden_horario.get(x.get("numhorario", 1000)))
 
     return render_template(
         "agenda.html",
@@ -73,3 +72,5 @@ def mostrar_agenda():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
