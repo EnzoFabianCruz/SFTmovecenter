@@ -2,13 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- necesario -->
   <title>Agenda SFT</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/agenda.css') }}">
 </head>
+
 <body>
-  <div class="container mt-4">
+  <!-- Contenedor responsivo -->
+  <div class="container-fluid custom-container mt-4">
+
     <h2 class="mb-4">Agenda SFT</h2>
+
     <p class="fw-bold">
       Semana del {{ fecha_inicio.strftime('%d/%m/%Y') }} al {{ fecha_fin.strftime('%d/%m/%Y') }}
     </p>
@@ -18,61 +23,77 @@
     <a href="{{ url_for('mostrar_agenda') }}?siguiente=1">Semana siguiente →</a>
 
     {% if agenda %}
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
-        <tr>
-          {% for col in agenda[0].keys() %}
-            {% if col != 'numhorario' %}
-              <th>{{ col }}</th>
+    <div class="tabla-wrapper tabla-scroll">
+      <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+          <tr>
+            {% for col in agenda[0].keys() %}
+              {% if col != 'numhorario' %}
+                <th>{{ col }}</th>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </thead>
+
+        <tbody>
+          {% set ultimo_numhorario = None %}
+          {% set columnas_visibles = agenda[0].keys() | reject('equalto', 'numhorario') | list | length %}
+
+          {% for fila in agenda %}
+            {% set numhorario_actual = fila.get('numhorario') %}
+
+            {% if ultimo_numhorario is not none and numhorario_actual != ultimo_numhorario %}
+              <tr class="borde-horario">
+                <td colspan="{{ columnas_visibles }}"></td>
+              </tr>
             {% endif %}
+
+            {% set ultimo_numhorario = numhorario_actual %}
+
+            <tr>
+              {% for clave, celda in fila.items() %}
+                {% if clave != 'numhorario' %}
+                  {% set contenido = celda|string %}
+                  <td
+                    {% if '[GRUPAL]NO' in contenido %}
+                      style="background-color: #fe0318;"
+                    {% elif '[GRUPAL]PR' in contenido %}
+                      style="background-color: #c49fff;"
+                    {% elif '[GRUPAL]' in contenido %}
+                      style="background-color: #00f539;"
+                    {% elif '[PERSONALIZADO]NO' in contenido %}
+                      style="background-color: #007bff;"
+                    {% elif '[PERSONALIZADO]' in contenido %}
+                      style="background-color: #5bc0de;"
+                    {% endif %}
+                  >
+                    {{ celda
+                        | replace('[GRUPAL]NO', '')
+                        | replace('[GRUPAL]PR', '')
+                        | replace('[GRUPAL]', '')
+                        | replace('[PERSONALIZADO]NO', '')
+                        | replace('[PERSONALIZADO]', '')
+                        | trim
+                    }}
+                  </td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+
           {% endfor %}
-        </tr>
-      </thead>
-     <tbody>
-  {% set ultimo_numhorario = None %}
-  {% set columnas_visibles = agenda[0].keys() | reject('equalto', 'numhorario') | list | length %}
+        </tbody>
 
-  {% for fila in agenda %}
-    {% set numhorario_actual = fila.get('numhorario') %}
+      </table>
+    </div>
 
-    {% if ultimo_numhorario is not none and numhorario_actual != ultimo_numhorario %}
-      <tr class="borde-horario">
-        <td colspan="{{ columnas_visibles }}"></td>
-      </tr>
-    {% endif %}
-
-    {% set ultimo_numhorario = numhorario_actual %}
-
-    <tr>
-      {% for clave, celda in fila.items() %}
-        {% if clave != 'numhorario' %}
-          {% set contenido = celda|string %}
-          <td 
-            {% if '[GRUPAL]NO' in contenido %}
-              style="background-color: #fe0318;"  
-            {% elif '[GRUPAL]PR' in contenido %}
-              style="background-color: #c49fff;"  
-            {% elif '[GRUPAL]' in contenido %}
-              style="background-color: #00f539;"  
-            {% elif '[PERSONALIZADO]NO' in contenido %}
-              style="background-color: #007bff;"  
-            {% elif '[PERSONALIZADO]' in contenido %}
-              style="background-color: #5bc0de;"  
-            {% endif %}
-          >
-            {{ celda }}
-          </td>
-        {% endif %}
-      {% endfor %}
-    </tr>
-  {% endfor %}
-</tbody>
-    </table>
     {% else %}
-      <div class="alert alert-warning" role="alert">
+      <div class="alert alert-warning mt-3" role="alert">
         No hay resultados para mostrar.
       </div>
     {% endif %}
-  </div>
+
+  </div> <!-- FIN DEL CONTENEDOR -->
+
 </body>
 </html>
